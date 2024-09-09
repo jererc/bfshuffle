@@ -16,14 +16,19 @@ Dependencies
 Params
 ------
 
-only from a list of favorites:
+`url` is the direct link to an experience map rotation, e.g.:
+```
+https://portal.battlefield.com/experience/mode/choose-maps?playgroundId=00000000-0000-0000-0000-000000000000
+```
+
+shuffle only from a list of favorites:
 ```
 included_maps = ['ARICA HARBOR', 'BREAKAWAY', 'CASPIAN BORDER',
     'DISCARDED', 'FLASHPOINT', 'HAVEN', 'HOURGLASS', 'MANIFEST', 'ORBITAL',
     'RECLAIMED', 'RENEWAL', 'SPEARHEAD', 'VALPARAISO']
 ```
 
-from all but these:
+shuffle from all but these:
 ```
 excluded_maps = ['EL ALAMEIN', 'REDACTED', 'STADIUM']
 ```

@@ -5,8 +5,8 @@ import time
 from urllib.parse import urlparse
 
 from selenium import webdriver
-from selenium.common import NoSuchElementException
-from selenium.common.exceptions import ElementClickInterceptedException
+from selenium.common.exceptions import (NoSuchElementException,
+    ElementClickInterceptedException)
 from selenium.webdriver import ActionChains
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.actions.wheel_input import ScrollOrigin
@@ -125,7 +125,7 @@ class BFShuffler(object):
         self._wait_for_login(url)
         self._wait_for_maps(url)
         self._clear_maps()
-        map_els = self._find_map_elements()   # needs to be reloaded to avoid stale elements
+        map_els = self._find_map_elements()   # reload to avoid stale elements
         get_name = lambda x: x.find_element(By.XPATH, './/span[@title]').text
         map_data = {get_name(e): {'el': e, 'y': e.location['y']}
             for e in map_els}

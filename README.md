@@ -1,7 +1,7 @@
 Battlefield 2042 Maps Shuffler
 ==============================
 
-Creates a shuffled map rotation for a [Battlefield 2042 Portal](https://portal.battlefield.com) experience.
+Generates a random map rotation for a [Battlefield 2042 Portal](https://portal.battlefield.com) experience.
 
 
 Dependencies

@@ -16,9 +16,9 @@ Dependencies
 Params
 ------
 
-- `url` is the direct link to an experience's map rotation, e.g.:
+- `url` is the experience's url, e.g.:
 ```
-https://portal.battlefield.com/experience/mode/choose-maps?playgroundId=00000000-0000-0000-0000-000000000000
+url = 'https://portal.battlefield.com/experience/package/era?playgroundId=33950500-6dbf-11ef-b522-01234567abcd'
 ```
 
 - `included_maps` allows to shuffle only from a list of favorites, e.g.:
@@ -28,7 +28,7 @@ included_maps = ['ARICA HARBOR', 'BREAKAWAY', 'CASPIAN BORDER',
     'RECLAIMED', 'RENEWAL', 'SPEARHEAD', 'VALPARAISO']
 ```
 
-- `excluded_maps` allows to exclude some maps, e.g.:
+- `excluded_maps` allows to shuffle from all maps except these, e.g.:
 ```
 excluded_maps = ['EL ALAMEIN', 'REDACTED', 'STADIUM']
 ```

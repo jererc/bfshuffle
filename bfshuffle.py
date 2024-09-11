@@ -2,7 +2,7 @@ import os
 import random
 import subprocess
 import time
-from urllib.parse import urlparse
+from urllib.parse import urlparse, parse_qs
 
 from selenium import webdriver
 from selenium.common.exceptions import (NoSuchElementException,
@@ -49,14 +49,16 @@ class BFShuffler(object):
         return driver
 
 
-    def _validate_url(self, url):
-        if not urlparse(url).path.endswith('/choose-maps'):
-            raise Exception('invalid url (expects '
-                'https://portal.battlefield.com/experience/mode/choose-maps?playgroundId=<UUID>)')
+    def _get_map_rotation_url(self, url):
+        try:
+            qs = parse_qs(urlparse(url).query)
+            playground_id = qs['playgroundId'][0]
+        except KeyError:
+            raise Exception(f'invalid url {url}')
+        return f'https://portal.battlefield.com/experience/mode/choose-maps?playgroundId={playground_id}'
 
 
     def _wait_for_login(self, url, poll_frequency=1, timeout=120):
-        self._validate_url(url)
         self.driver.get(url)
         end_ts = time.time() + timeout
         while time.time() < end_ts:
@@ -122,8 +124,9 @@ class BFShuffler(object):
 
     def shuffle(self, url, included_maps=None, excluded_maps=None,
             max_maps=MAX_MAPS):
-        self._wait_for_login(url)
-        self._wait_for_maps(url)
+        map_url = self._get_map_rotation_url(url)
+        self._wait_for_login(map_url)
+        self._wait_for_maps(map_url)
         self._clear_maps()
         map_els = self._find_map_elements()   # reload to avoid stale elements
         get_name = lambda x: x.find_element(By.XPATH, './/span[@title]').text

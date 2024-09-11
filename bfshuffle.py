@@ -31,13 +31,12 @@ class BFShuffler(object):
 
 
     def _get_driver(self):
-        data_dir = CHROME_WIN_DATA_DIR if IS_NT else CHROME_LINUX_DATA_DIR
-        if not os.path.exists(data_dir):
-            raise Exception(f'chrome data dir {data_dir} does not exist')
+        if not os.path.exists(DATA_DIR):
+            raise Exception(f'chrome data dir {DATA_DIR} does not exist')
         subprocess.call('taskkill /IM chrome.exe' if IS_NT else 'pkill chrome',
             shell=True)
         options = Options()
-        options.add_argument(f'--user-data-dir={data_dir}')
+        options.add_argument(f'--user-data-dir={DATA_DIR}')
         options.add_argument(f'--profile-directory={self.profile_dir}')
         options.add_argument('--start-maximized')
         options.add_argument('--disable-blink-features=AutomationControlled')

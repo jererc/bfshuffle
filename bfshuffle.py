@@ -85,26 +85,39 @@ class BFShuffler(object):
         raise Exception('maps timeout')
 
 
-    def _clear_maps(self):
-        xpath = '//button[mat-icon[@data-mat-icon-name="remove_circle_outline"]]'
+    def _get_map_name(self, map_element):
+        return map_element.find_element(By.XPATH, './/span[@title]').text
+
+
+    def _get_and_clear_map_rotation(self):
+        res = []
         while True:
             try:
-                self.driver.find_element(By.XPATH, xpath).click()
+                el = self.driver.find_element(By.XPATH,
+                    '//app-map-row[contains(@class, "map-row") and contains(@class, "compact")]')
+                res.append(self._get_map_name(el))
+                el.find_element(By.XPATH,
+                    './/button[mat-icon[@data-mat-icon-name="remove_circle_outline"]]',
+                    ).click()
             except NoSuchElementException:
                 break
+        return res
 
 
-    def _select_maps(self, all_maps, included_maps, excluded_maps, max_maps):
-        print(f'all maps: {sorted(all_maps)}')
+    def _select_maps(self, available_maps, map_rotation,
+            included_maps, excluded_maps, max_maps):
+        print(f'map rotation: {map_rotation}')
+        print(f'available maps: {sorted(available_maps)}')
+        preselected = available_maps - ({map_rotation[0]} if map_rotation else {})
         if included_maps:
-            candidates = list(all_maps & set(included_maps))
+            new_map_rotation = list(preselected & set(included_maps))
         elif excluded_maps:
-            candidates = list(all_maps - set(excluded_maps))
+            new_map_rotation = list(preselected - set(excluded_maps))
         else:
-            candidates = list(all_maps)
-        random.shuffle(candidates)
-        res = candidates[:min(max_maps, MAX_MAPS)]
-        print(f'selected maps: {res}')
+            new_map_rotation = list(preselected)
+        random.shuffle(new_map_rotation)
+        res = new_map_rotation[:min(max_maps, MAX_MAPS)]
+        print(f'new map rotation: {res}')
         return res
 
 
@@ -127,13 +140,12 @@ class BFShuffler(object):
         map_url = self._get_map_rotation_url(url)
         self._wait_for_login(map_url)
         self._wait_for_maps(map_url)
-        self._clear_maps()
+        map_rotation = self._get_and_clear_map_rotation()
         map_els = self._find_map_elements()   # reload to avoid stale elements
-        get_name = lambda x: x.find_element(By.XPATH, './/span[@title]').text
-        map_data = {get_name(e): {'el': e, 'y': e.location['y']}
+        map_data = {self._get_map_name(e): {'el': e, 'y': e.location['y']}
             for e in map_els}
         selected_maps = self._select_maps(set(map_data.keys()),
-            included_maps, excluded_maps, max_maps)
+            map_rotation, included_maps, excluded_maps, max_maps)
         y_offset = map_els[0].location['y']
         for name in selected_maps:
             data = map_data[name]

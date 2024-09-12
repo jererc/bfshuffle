@@ -17,8 +17,8 @@ WIN_CHROME_DATA_DIR = os.path.expanduser(
     r'~\AppData\Local\Google\Chrome\User Data')
 LINUX_CHROME_DATA_DIR = os.path.expanduser(
     '~/.config/google-chrome')
-DATA_DIR = WIN_CHROME_DATA_DIR if IS_WIN else LINUX_CHROME_DATA_DIR
 IS_WIN = os.name == 'nt'
+DATA_DIR = WIN_CHROME_DATA_DIR if IS_WIN else LINUX_CHROME_DATA_DIR
 DEFAULT_PROFILE_DIR = 'selenium'
 MAX_MAPS = 20
 

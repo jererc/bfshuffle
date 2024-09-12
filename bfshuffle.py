@@ -13,12 +13,12 @@ from selenium.webdriver.common.actions.wheel_input import ScrollOrigin
 from selenium.webdriver.common.by import By
 
 
-CHROME_WIN_DATA_DIR = os.path.expanduser(
+WIN_CHROME_DATA_DIR = os.path.expanduser(
     r'~\AppData\Local\Google\Chrome\User Data')
-CHROME_LINUX_DATA_DIR = os.path.expanduser(
+LINUX_CHROME_DATA_DIR = os.path.expanduser(
     '~/.config/google-chrome')
-IS_NT = os.name == 'nt'
-DATA_DIR = CHROME_WIN_DATA_DIR if IS_NT else CHROME_LINUX_DATA_DIR
+DATA_DIR = WIN_CHROME_DATA_DIR if IS_WIN else LINUX_CHROME_DATA_DIR
+IS_WIN = os.name == 'nt'
 DEFAULT_PROFILE_DIR = 'selenium'
 MAX_MAPS = 20
 
@@ -33,7 +33,7 @@ class BFShuffler(object):
     def _get_driver(self):
         if not os.path.exists(DATA_DIR):
             raise Exception(f'chrome data dir {DATA_DIR} does not exist')
-        subprocess.call('taskkill /IM chrome.exe' if IS_NT else 'pkill chrome',
+        subprocess.call('taskkill /IM chrome.exe' if IS_WIN else 'pkill chrome',
             shell=True)
         options = Options()
         options.add_argument(f'--user-data-dir={DATA_DIR}')

@@ -1,4 +1,5 @@
 import os
+from pprint import pformat
 import random
 import subprocess
 import time
@@ -105,19 +106,20 @@ class BFShuffler(object):
 
     def _select_maps(self, available_maps, map_rotation,
             included_maps, excluded_maps, max_maps):
-        print(f'map rotation: {map_rotation}')
-        print(f'available maps: {sorted(available_maps)}')
-        preselected = available_maps - ({map_rotation[0]} if map_rotation else {})
+        print(f'map rotation:\n{pformat(map_rotation)}')
+        print(f'available maps:\n{pformat(sorted(available_maps))}')
         if included_maps:
-            new_map_rotation = list(preselected & set(included_maps))
+            new_map_rotation = list(available_maps & set(included_maps))
         elif excluded_maps:
-            new_map_rotation = list(preselected - set(excluded_maps))
+            new_map_rotation = list(available_maps - set(excluded_maps))
         else:
-            new_map_rotation = list(preselected)
+            new_map_rotation = list(available_maps)
         random.shuffle(new_map_rotation)
-        res = new_map_rotation[:min(max_maps, MAX_MAPS)]
-        print(f'new map rotation: {res}')
-        return res
+        new_map_rotation = new_map_rotation[:min(max_maps, MAX_MAPS)]
+        if map_rotation and new_map_rotation[0] == map_rotation[0]:
+            new_map_rotation.append(new_map_rotation.pop(0))
+        print(f'new map rotation:\n{pformat(new_map_rotation)}')
+        return new_map_rotation
 
 
     def _scroll_from_element(self, element, y):

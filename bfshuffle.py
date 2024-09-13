@@ -14,12 +14,9 @@ from selenium.webdriver.common.actions.wheel_input import ScrollOrigin
 from selenium.webdriver.common.by import By
 
 
-WIN_CHROME_DATA_DIR = os.path.expanduser(
-    r'~\AppData\Local\Google\Chrome\User Data')
-LINUX_CHROME_DATA_DIR = os.path.expanduser(
-    '~/.config/google-chrome')
 IS_WIN = os.name == 'nt'
-DATA_DIR = WIN_CHROME_DATA_DIR if IS_WIN else LINUX_CHROME_DATA_DIR
+DATA_DIR = os.path.expanduser(r'~\AppData\Local\Google\Chrome\User Data'
+    if IS_WIN else '~/.config/google-chrome')
 DEFAULT_PROFILE_DIR = 'selenium'
 MAX_MAPS = 20
 
@@ -34,15 +31,16 @@ class BFShuffler(object):
     def _get_driver(self):
         if not os.path.exists(DATA_DIR):
             raise Exception(f'chrome data dir {DATA_DIR} does not exist')
-        subprocess.call('taskkill /IM chrome.exe' if IS_WIN else 'pkill chrome',
-            shell=True)
+        subprocess.call('taskkill /IM chrome.exe'
+            if IS_WIN else 'pkill chrome', shell=True)
         options = Options()
         options.add_argument(f'--user-data-dir={DATA_DIR}')
         options.add_argument(f'--profile-directory={self.profile_dir}')
         options.add_argument('--start-maximized')
         options.add_argument('--disable-blink-features=AutomationControlled')
         options.add_experimental_option('useAutomationExtension', False)
-        options.add_experimental_option('excludeSwitches', ['enable-automation'])
+        options.add_experimental_option('excludeSwitches',
+            ['enable-automation'])
         options.add_experimental_option('detach', True)
         driver = webdriver.Chrome(options=options)
         driver.implicitly_wait(1)
@@ -51,11 +49,11 @@ class BFShuffler(object):
 
     def _get_map_rotation_url(self, url):
         try:
-            qs = parse_qs(urlparse(url).query)
-            playground_id = qs['playgroundId'][0]
+            playground_id = parse_qs(urlparse(url).query)['playgroundId'][0]
         except KeyError:
             raise Exception(f'invalid url {url}')
-        return f'https://portal.battlefield.com/experience/mode/choose-maps?playgroundId={playground_id}'
+        return 'https://portal.battlefield.com/experience/mode/choose-maps' \
+            f'?playgroundId={playground_id}'
 
 
     def _wait_for_login(self, url, poll_frequency=1, timeout=120):

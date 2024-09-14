@@ -3,6 +3,14 @@ Battlefield 2042 Maps Shuffler
 
 Generates a random map rotation for a [Battlefield 2042 Portal](https://portal.battlefield.com) experience.
 
+A new chrome profile is created in order not to mess with the user profile.
+The user has to login for the first run.
+
+A shortcut can be created to the `pythonw.exe` executable (from a virtualenv is better) with the script as argument, e.g.:
+```
+C:\Users\jerer\venv\Scripts\pythonw.exe C:\Users\jerer\bfshuffle\run.py
+```
+
 
 Dependencies
 ------------

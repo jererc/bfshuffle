@@ -16,7 +16,6 @@ Dependencies
 ------------
 
 - python
-- pip
 - selenium (pip install selenium)
 - google chrome
 

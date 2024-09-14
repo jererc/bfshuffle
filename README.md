@@ -12,7 +12,7 @@ C:\Users\jerer\venv\Scripts\pythonw.exe C:\Users\jerer\bfshuffle\run.py
 ```
 
 
-Dependencies
+Requirements
 ------------
 
 - python

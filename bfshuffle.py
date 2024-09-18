@@ -21,13 +21,11 @@ PROFILE_DIR = 'selenium'
 MAX_MAPS = 20
 
 
-class BFShuffler(object):
-
+class BFShuffler:
     def __init__(self, data_dir=DATA_DIR, profile_dir=PROFILE_DIR):
         self.data_dir = data_dir
         self.profile_dir = profile_dir
         self.driver = self._get_driver()
-
 
     def _get_driver(self):
         if not os.path.exists(self.data_dir):
@@ -47,7 +45,6 @@ class BFShuffler(object):
         driver.implicitly_wait(1)
         return driver
 
-
     def _get_map_rotation_url(self, url):
         try:
             playground_id = parse_qs(urlparse(url).query)['playgroundId'][0]
@@ -55,7 +52,6 @@ class BFShuffler(object):
             raise Exception(f'invalid url {url}')
         return 'https://portal.battlefield.com/experience/mode/choose-maps' \
             f'?playgroundId={playground_id}'
-
 
     def _wait_for_login(self, url, poll_frequency=1, timeout=120):
         self.driver.get(url)
@@ -68,10 +64,8 @@ class BFShuffler(object):
                 time.sleep(poll_frequency)
         raise Exception('login timeout')
 
-
     def _find_map_elements(self):
         return self.driver.find_elements(By.XPATH, '//app-map-row')
-
 
     def _wait_for_maps(self, url, attempts=3, poll_frequency=1, timeout=5):
         for i in range(attempts):   # sometimes the content does not load
@@ -83,10 +77,8 @@ class BFShuffler(object):
             self.driver.get(url)
         raise Exception('maps timeout')
 
-
     def _get_map_name(self, map_element):
         return map_element.find_element(By.XPATH, './/span[@title]').text
-
 
     def _get_and_clear_map_rotation(self):
         res = []
@@ -101,7 +93,6 @@ class BFShuffler(object):
             except NoSuchElementException:
                 break
         return res
-
 
     def _select_maps(self, available_maps, map_rotation,
             included_maps, excluded_maps, max_maps):
@@ -120,7 +111,6 @@ class BFShuffler(object):
         print(f'new map rotation:\n{pformat(new_map_rotation)}')
         return new_map_rotation
 
-
     def _scroll_from_element(self, element, y):
         scroll_origin = ScrollOrigin.from_element(element)
         (ActionChains(self.driver)
@@ -128,12 +118,10 @@ class BFShuffler(object):
             .perform()
         )
 
-
     def _add_map_element(self, element):
         element.find_element(By.XPATH,
             './/button[mat-icon[@data-mat-icon-name="add_circle_outline"]]',
             ).click()
-
 
     def shuffle(self, url, included_maps=None, excluded_maps=None,
             max_maps=MAX_MAPS):

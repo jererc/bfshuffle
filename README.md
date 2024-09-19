@@ -10,6 +10,10 @@ On windows, a shortcut can be created to the `pythonw.exe` executable (from a vi
 ```
 C:\Users\jerer\venv\Scripts\pythonw.exe C:\Users\jerer\bfshuffle\run.py
 ```
+or without a virtualenv:
+```
+C:\Users\jerer\AppData\Local\Programs\Python\Python312\pythonw.exe C:\Users\jerer\bfshuffle\run.py
+```
 
 
 Requirements

@@ -23,7 +23,13 @@ KILL_CHROME_CMD = {
     'posix': 'pkill chrome',
 }[os.name]
 PROFILE_DIR = 'selenium'
+CONFIGS = []
 MAX_MAPS = 20
+
+try:
+    from user_settings import *
+except ImportError:
+    pass
 
 
 class BFShuffler:
@@ -156,3 +162,13 @@ class BFShuffler:
             '//button[@aria-label="save button"]').click()
         time.sleep(3)
         self.driver.quit()
+
+
+def main():
+    bfs = BFShuffler()
+    for config in CONFIGS:
+        bfs.shuffle(**config)
+
+
+if __name__ == '__main__':
+    main()

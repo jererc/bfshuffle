@@ -161,6 +161,8 @@ class BFShuffler:
         self.driver.find_element(By.XPATH,
             '//button[@aria-label="save button"]').click()
         time.sleep(3)
+
+    def quit(self):
         self.driver.quit()
 
 
@@ -168,6 +170,7 @@ def main():
     bfs = BFShuffler()
     for config in CONFIGS:
         bfs.shuffle(**config)
+    bfs.quit()
 
 
 if __name__ == '__main__':

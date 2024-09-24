@@ -41,7 +41,7 @@ class BFShuffler:
     def _get_driver(self):
         if not os.path.exists(self.data_dir):
             raise Exception(f'chrome data dir {self.data_dir} does not exist')
-        subprocess.call(KILL_CHROME_CMD, shell=True)   # weird results if chrome is running
+        subprocess.call(KILL_CHROME_CMD, shell=True)
         options = Options()
         options.add_argument(f'--user-data-dir={self.data_dir}')
         options.add_argument(f'--profile-directory={self.profile_dir}')
@@ -95,10 +95,12 @@ class BFShuffler:
         while True:
             try:
                 el = self.driver.find_element(By.XPATH,
-                    '//app-map-row[contains(@class, "map-row") and contains(@class, "compact")]')
+                    '//app-map-row[contains(@class, "map-row") '
+                    'and contains(@class, "compact")]')
                 res.append(self._get_map_name(el))
                 el.find_element(By.XPATH,
-                    './/button[mat-icon[@data-mat-icon-name="remove_circle_outline"]]',
+                    './/button[mat-icon[@data-mat-icon-name'
+                    '="remove_circle_outline"]]',
                     ).click()
             except NoSuchElementException:
                 break

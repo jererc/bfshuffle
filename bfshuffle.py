@@ -9,12 +9,11 @@ from selenium.webdriver import ActionChains
 from selenium.webdriver.common.actions.wheel_input import ScrollOrigin
 from selenium.webdriver.common.by import By
 
-from chromium import Browser
+from chromium import Chromium
 
 
 CONFIGS = []
 MAX_MAPS = 20
-BROWSER_NAME = 'brave'
 
 try:
     from user_settings import *
@@ -22,10 +21,7 @@ except ImportError:
     pass
 
 
-class BFShuffler(Browser):
-    def __init__(self):
-        super().__init__(name=BROWSER_NAME)
-
+class BFShuffler(Chromium):
     def _get_map_rotation_url(self, url):
         try:
             playground_id = parse_qs(urlparse(url).query)['playgroundId'][0]

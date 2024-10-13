@@ -21,7 +21,7 @@ Requirements
 
 - python
 - selenium (pip install selenium)
-- google chrome
+- brave or chrome
 
 
 Config

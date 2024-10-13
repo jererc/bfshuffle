@@ -1,30 +1,20 @@
-import os
 from pprint import pformat
 import random
-import subprocess
 import time
 from urllib.parse import urlparse, parse_qs
 
-from selenium import webdriver
 from selenium.common.exceptions import (NoSuchElementException,
     ElementClickInterceptedException)
 from selenium.webdriver import ActionChains
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.actions.wheel_input import ScrollOrigin
 from selenium.webdriver.common.by import By
 
+from chromium import Browser
 
-DATA_DIR = {
-    'nt': os.path.expanduser(r'~\AppData\Local\Google\Chrome\User Data'),
-    'posix': os.path.expanduser('~/.config/google-chrome'),
-}[os.name]
-KILL_CHROME_CMD = {
-    'nt': 'taskkill /IM chrome.exe',
-    'posix': 'pkill chrome',
-}[os.name]
-PROFILE_DIR = 'selenium'
+
 CONFIGS = []
 MAX_MAPS = 20
+BROWSER_NAME = 'brave'
 
 try:
     from user_settings import *
@@ -32,28 +22,9 @@ except ImportError:
     pass
 
 
-class BFShuffler:
-    def __init__(self, data_dir=DATA_DIR, profile_dir=PROFILE_DIR):
-        self.data_dir = data_dir
-        self.profile_dir = profile_dir
-        self.driver = self._get_driver()
-
-    def _get_driver(self):
-        if not os.path.exists(self.data_dir):
-            raise Exception(f'chrome data dir {self.data_dir} does not exist')
-        subprocess.call(KILL_CHROME_CMD, shell=True)
-        options = Options()
-        options.add_argument(f'--user-data-dir={self.data_dir}')
-        options.add_argument(f'--profile-directory={self.profile_dir}')
-        options.add_argument('--start-maximized')
-        options.add_argument('--disable-blink-features=AutomationControlled')
-        options.add_experimental_option('useAutomationExtension', False)
-        options.add_experimental_option('excludeSwitches',
-            ['enable-automation'])
-        options.add_experimental_option('detach', True)
-        driver = webdriver.Chrome(options=options)
-        driver.implicitly_wait(1)
-        return driver
+class BFShuffler(Browser):
+    def __init__(self):
+        super().__init__(name=BROWSER_NAME)
 
     def _get_map_rotation_url(self, url):
         try:
@@ -138,6 +109,7 @@ class BFShuffler:
     def shuffle(self, url, included_maps=None, excluded_maps=None,
             max_maps=MAX_MAPS):
         map_url = self._get_map_rotation_url(url)
+        print(f'map rotation url: {map_url}')
         self._wait_for_login(map_url)
         self._wait_for_maps(map_url)
         map_rotation = self._get_and_clear_map_rotation()
@@ -163,9 +135,6 @@ class BFShuffler:
         self.driver.find_element(By.XPATH,
             '//button[@aria-label="save button"]').click()
         time.sleep(3)
-
-    def quit(self):
-        self.driver.quit()
 
 
 def main():

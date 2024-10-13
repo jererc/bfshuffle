@@ -27,7 +27,7 @@ CONFIGS = {
             'binary': '/opt/google/chrome/chrome',
             'data_dir': '~/.config/google-chrome',
         },
-    ]
+    ],
 }[os.name]
 KILL_CMD = {
     'nt': 'taskkill /IM {binary}',

@@ -10,22 +10,24 @@ CONFIGS = {
         {
             'binary': r'C:\Program Files\BraveSoftware'
                 r'\Brave-Browser\Application\brave.exe',
-            'data_dir': r'~\AppData\Local\BraveSoftware'
-                r'\Brave-Browser\User Data',
+            'data_dir': os.path.expanduser(
+                r'~\AppData\Local\BraveSoftware\Brave-Browser\User Data'),
         },
         {
             'binary': r'C:\Program Files\Google\Chrome\Application\chrome.exe',
-            'data_dir': r'~\AppData\Local\Google\Chrome\User Data',
+            'data_dir': os.path.expanduser(
+                r'~\AppData\Local\Google\Chrome\User Data'),
         },
     ],
     'posix': [
         {
             'binary': '/opt/brave.com/brave/brave',
-            'data_dir': '~/.config/BraveSoftware/Brave-Browser',
+            'data_dir': os.path.expanduser(
+                '~/.config/BraveSoftware/Brave-Browser'),
         },
         {
             'binary': '/opt/google/chrome/chrome',
-            'data_dir': '~/.config/google-chrome',
+            'data_dir': os.path.expanduser('~/.config/google-chrome'),
         },
     ],
 }[os.name]
@@ -39,14 +41,14 @@ PROFILE_DIR = 'selenium'
 class Chromium:
     def __init__(self, profile_dir=PROFILE_DIR):
         self.profile_dir = profile_dir
-        self.config = self._get_available_config()
-        self.data_dir = os.path.expanduser(self.config['data_dir'])
-        self.binary = self.config['binary']
+        config = self._get_config()
+        self.data_dir = config['data_dir']
+        self.binary = config['binary']
         self.driver = self._get_driver()
 
-    def _get_available_config(self):
+    def _get_config(self):
         for config in CONFIGS:
-            if os.path.exists(config['binary']):
+            if all(os.path.exists(p) for p in config.values()):
                 return config
         raise Exception('no available browser')
 
@@ -55,10 +57,6 @@ class Chromium:
             binary=os.path.basename(self.binary)), shell=True)
 
     def _get_driver(self):
-        if not os.path.exists(self.data_dir):
-            raise Exception(f'{self.data_dir} not found')
-        if not os.path.exists(self.binary):
-            raise Exception(f'{self.binary} not found')
         self._kill_running_browser()
         options = Options()
         options.add_argument(f'--user-data-dir={self.data_dir}')

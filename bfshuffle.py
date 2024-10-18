@@ -30,7 +30,7 @@ class BFShuffler(Chromium):
         return 'https://portal.battlefield.com/experience/mode/choose-maps' \
             f'?playgroundId={playground_id}'
 
-    def _wait_for_login(self, url, poll_frequency=1, timeout=120):
+    def _wait_for_login(self, url, poll_frequency=.5, timeout=120):
         self.driver.get(url)
         end_ts = time.time() + timeout
         while time.time() < end_ts:
@@ -44,7 +44,7 @@ class BFShuffler(Chromium):
     def _find_map_elements(self):
         return self.driver.find_elements(By.XPATH, '//app-map-row')
 
-    def _wait_for_maps(self, url, attempts=3, poll_frequency=1, timeout=5):
+    def _wait_for_maps(self, url, attempts=3, poll_frequency=.5, timeout=3):
         for i in range(attempts):   # sometimes the content does not load
             end_ts = time.time() + timeout
             while time.time() < end_ts:
@@ -102,6 +102,21 @@ class BFShuffler(Chromium):
             './/button[mat-icon[@data-mat-icon-name="add_circle_outline"]]',
             ).click()
 
+    def _save(self):
+        def get_save_button():
+            return self.driver.find_element(By.XPATH,
+                '//button[@aria-label="save button"]')
+
+        get_save_button().click()
+        end_ts = time.time() + 5
+        while time.time() < end_ts:
+            try:
+                get_save_button()
+            except NoSuchElementException:
+                print('saved')
+                return
+            time.sleep(.5)
+
     def shuffle(self, url, included_maps=None, excluded_maps=None,
             max_maps=MAX_MAPS):
         map_url = self._get_map_rotation_url(url)
@@ -127,10 +142,7 @@ class BFShuffler(Chromium):
                         self._add_map_element(data['el'])
                     except ElementClickInterceptedException:
                         print(f'failed to add map {name}')
-
-        self.driver.find_element(By.XPATH,
-            '//button[@aria-label="save button"]').click()
-        time.sleep(3)
+        self._save()
 
 
 def main():

@@ -132,16 +132,11 @@ class BFShuffler(Chromium):
         y_offset = map_els[0].location['y']
         for name in selected_maps:
             data = map_data[name]
+            self._scroll_from_element(map_els[0], data['y'] - y_offset)
             try:
                 self._add_map_element(data['el'])
             except ElementClickInterceptedException:
-                y_delta = data['y'] - y_offset
-                if y_delta:
-                    self._scroll_from_element(map_els[0], y_delta)
-                    try:
-                        self._add_map_element(data['el'])
-                    except ElementClickInterceptedException:
-                        print(f'failed to add map {name}')
+                print(f'failed to add map {name}')
         self._save()
 
 

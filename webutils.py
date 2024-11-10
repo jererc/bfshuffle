@@ -5,7 +5,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
 
-CONFIGS = {
+BROWSER_CONFIGS = {
     'nt': {
         'brave': {
             'binary': r'C:\Program Files\BraveSoftware'
@@ -31,15 +31,15 @@ CONFIGS = {
         },
     },
 }[os.name]
-KILL_CMD = {
+BROWSER_KILL_CMD = {
     'nt': 'taskkill /IM {binary}',
     'posix': 'pkill {binary}',
 }[os.name]
-PROFILE_DIR = 'selenium'
+BROWSER_PROFILE_DIR = 'selenium'
 
 
 class Browser:
-    def __init__(self, browser_id=None, profile_dir=PROFILE_DIR,
+    def __init__(self, browser_id=None, profile_dir=BROWSER_PROFILE_DIR,
             headless=False, page_load_strategy=None):
         self.profile_dir = profile_dir
         self.headless = headless
@@ -52,16 +52,16 @@ class Browser:
     def _get_config(self, browser_id):
         if browser_id:
             try:
-                return CONFIGS[browser_id]
+                return BROWSER_CONFIGS[browser_id]
             except KeyError:
                 raise Exception(f'unsupported browser_id {browser_id}')
-        for config in CONFIGS.values():
+        for config in BROWSER_CONFIGS.values():
             if all(os.path.exists(p) for p in config.values()):
                 return config
         raise Exception('no available browser')
 
     def _kill_running_browser(self):
-        subprocess.call(KILL_CMD.format(
+        subprocess.call(BROWSER_KILL_CMD.format(
             binary=os.path.basename(self.binary)), shell=True)
 
     def _get_driver(self):

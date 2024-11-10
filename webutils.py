@@ -67,10 +67,10 @@ class Browser:
     def _get_driver(self):
         self._kill_running_browser()
         options = Options()
-        if self.page_load_strategy is not None:
-            options.page_load_strategy = self.page_load_strategy
         if self.headless:
             options.add_argument('--headless')
+        if self.page_load_strategy:
+            options.page_load_strategy = self.page_load_strategy
         options.add_argument(f'--user-data-dir={self.data_dir}')
         options.add_argument(f'--profile-directory={self.profile_dir}')
         options.add_argument('--start-maximized')

@@ -148,7 +148,7 @@ def main():
     bfs = BFShuffler()
     for config in CONFIGS:
         bfs.shuffle(**config)
-    bfs.quit()
+    bfs.driver.quit()
 
 
 if __name__ == '__main__':

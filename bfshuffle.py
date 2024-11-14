@@ -14,7 +14,7 @@ from webutils import Browser
 
 CONFIGS = []
 MAX_MAPS = 20
-BROWSER_ID = None
+BROWSER_ID = 'chrome'
 
 try:
     from user_settings import *

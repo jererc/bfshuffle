@@ -35,11 +35,12 @@ BROWSER_KILL_CMD = {
     'nt': 'taskkill /IM {binary}',
     'posix': 'pkill {binary}',
 }[os.name]
+BROWSER_ID = 'chrome'
 BROWSER_PROFILE_DIR = 'selenium'
 
 
 class Browser:
-    def __init__(self, browser_id=None, profile_dir=BROWSER_PROFILE_DIR,
+    def __init__(self, browser_id=BROWSER_ID, profile_dir=BROWSER_PROFILE_DIR,
             headless=False, page_load_strategy=None):
         self.profile_dir = profile_dir
         self.headless = headless

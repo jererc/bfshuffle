@@ -23,8 +23,8 @@ except ImportError:
 
 
 class BFShuffler:
-    def __init__(self):
-        self.driver = Browser(browser_id=BROWSER_ID).driver
+    def __init__(self, browser_id=BROWSER_ID):
+        self.driver = Browser(browser_id=browser_id).driver
 
     def _get_map_rotation_url(self, url):
         try:

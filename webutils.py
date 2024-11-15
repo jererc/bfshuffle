@@ -48,7 +48,6 @@ class Browser:
         config = self._get_config(browser_id)
         self.data_dir = config['data_dir']
         self.binary = config['binary']
-        self.driver = self._get_driver()
 
     def _get_config(self, browser_id):
         if browser_id:
@@ -65,7 +64,7 @@ class Browser:
         subprocess.call(BROWSER_KILL_CMD.format(
             binary=os.path.basename(self.binary)), shell=True)
 
-    def _get_driver(self):
+    def get_driver(self):
         self._kill_running_browser()
         options = Options()
         if self.headless:
@@ -85,5 +84,6 @@ class Browser:
         driver.implicitly_wait(1)
         return driver
 
-    def quit(self):
-        self.driver.quit()
+
+def get_browser_driver(*args, **kwargs):
+    return Browser(*args, **kwargs).get_driver()

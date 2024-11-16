@@ -1,1 +1,1 @@
-selenium
+git+https://github.com/jererc/webutils.git

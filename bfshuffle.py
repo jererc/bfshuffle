@@ -9,7 +9,7 @@ from selenium.webdriver import ActionChains
 from selenium.webdriver.common.actions.wheel_input import ScrollOrigin
 from selenium.webdriver.common.by import By
 
-from webutils import get_browser_driver
+from webutils.browser import get_driver
 
 
 CONFIGS = []
@@ -24,7 +24,7 @@ except ImportError:
 
 class BFShuffler:
     def __init__(self, browser_id=BROWSER_ID):
-        self.driver = get_browser_driver(browser_id=browser_id)
+        self.driver = get_driver(browser_id=browser_id)
 
     def _get_map_rotation_url(self, url):
         try:

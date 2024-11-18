@@ -129,7 +129,8 @@ class Shuffler:
         y_offset = map_els[0].location['y']
         for name in selected_maps:
             data = map_data[name]
-            self._scroll_from_element(map_els[0], data['y'] - y_offset)
+            if not data['el'].is_displayed():
+                self._scroll_from_element(map_els[0], data['y'] - y_offset)
             try:
                 self._add_map_element(data['el'])
             except ElementClickInterceptedException:

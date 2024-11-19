@@ -8,19 +8,25 @@ Requirements
 ------------
 
 - python
-- brave or chrome
+- google chrome or brave
 
 
 Install
 -------
 
-- download `bootstrap\bootstrap.bat` in some directory
-- run it
-- create the config file `user_settings.py` in the same directory
-- run `bfshuffle.bat`
+Download `bootstrap\bootstrap.bat` in some directory and run it.
+Create the config file `user_settings.py` in the same directory.
 
 
-Example config:
+Run
+---
+
+Run the `bfshuffle.bat` file created by bootstrap.
+
+
+Config example
+--------------
+
 
 ```
 CONFIGS = [

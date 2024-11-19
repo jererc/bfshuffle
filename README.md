@@ -14,8 +14,11 @@ Requirements
 Install
 -------
 
-Download `bootstrap\bootstrap.bat` in some directory.
-Create the config file `user_settings.py` in the same directory.
+- download `bootstrap\bootstrap.bat` in some directory
+- run it
+- create the config file `user_settings.py` in the same directory
+- run `bfshuffle.bat`
+
 
 Example config:
 

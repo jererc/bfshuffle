@@ -8,10 +8,11 @@ from bfshuffle.shuffler import Shuffler
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--path', '-p')
+    parser.add_argument('--path', '-p', default=os.getcwd())
     args = parser.parse_args()
+    path = os.path.realpath(os.path.expanduser(args.path))
     config = Config(
-        os.path.join(os.path.expanduser(args.path), 'user_settings.py'),
+        os.path.join(path, 'user_settings.py'),
         BROWSER_ID='chrome',
     )
     Shuffler(config).run()

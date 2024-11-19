@@ -135,7 +135,8 @@ class Shuffler:
                     break
                 except ElementClickInterceptedException:
                     if i == 0:
-                        self._scroll_from_element(map_els[0], data['y'] - y_offset)
+                        self._scroll_from_element(map_els[0],
+                            data['y'] - y_offset)
                     else:
                         print(f'failed to add map {name}')
         self._save()

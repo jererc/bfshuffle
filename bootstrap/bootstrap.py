@@ -5,9 +5,10 @@ url = 'https://raw.githubusercontent.com/jererc/svcutils/refs/heads/main/svcutil
 exec(urllib.request.urlopen(url).read().decode('utf-8'))
 Bootstrapper(
     name='bfshuffle',
+    script_module='bfshuffle.main',
     install_requires=[
         # 'git+https://github.com/jererc/bfshuffle.git',
         'bfshuffle @ https://github.com/jererc/bfshuffle/archive/refs/heads/main.zip',
     ],
     force_reinstall=True,
-).setup_venv()
+).setup_script()

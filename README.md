@@ -11,6 +11,12 @@ Requirements
 - brave or chrome
 
 
+Install
+-------
+
+Download `bootstrap\bootstrap.bat` in some directory.
+Create the config file `user_settings.py` in the same directory.
+
 Example config:
 
 ```

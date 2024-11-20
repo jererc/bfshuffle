@@ -1,3 +1,3 @@
 @echo off
-set URL=https://raw.githubusercontent.com/jererc/bfshuffle/refs/heads/main/bootstrap/bootstrap.py
-curl -s %URL% | python
+curl -s "https://raw.githubusercontent.com/jererc/bfshuffle/refs/heads/main/bootstrap/bootstrap.py" | python
+curl -O "https://raw.githubusercontent.com/jererc/bfshuffle/refs/heads/main/bootstrap/user_settings.py"

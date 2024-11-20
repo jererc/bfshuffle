@@ -15,47 +15,10 @@ Install
 -------
 
 Download `bootstrap\bootstrap.bat` in some directory and run it.
-Create the config file `user_settings.py` in the same directory.
+Update the url and maps in the `user_settings.py` config file.
 
 
 Run
 ---
 
-Run the `bfshuffle.bat` file created by bootstrap.
-
-
-Config example
---------------
-
-
-```
-CONFIGS = [
-    {
-        'url': 'https://portal.battlefield.com/experience/package/era?playgroundId=33950500-6dbf-11ef-b522-000000000000',
-        'included_maps': [
-            'ARICA HARBOR',
-            'BATTLE OF THE BULGE',
-            'BREAKAWAY',
-            'CASPIAN BORDER',
-            'DISCARDED',
-            # 'EL ALAMEIN',
-            'EXPOSURE',
-            'FLASHPOINT',
-            'HAVEN',
-            'HOURGLASS',
-            'KALEIDOSCOPE',
-            'MANIFEST',
-            'NOSHAHR CANALS',
-            'ORBITAL',
-            'RECLAIMED',
-            # 'REDACTED',
-            'RENEWAL',
-            'SPEARHEAD',
-            # 'STADIUM',
-            'STRANDED',
-            'VALPARAISO',
-        ],
-        'max_maps': 7,
-    },
-]
-```
+Run `bfshuffle.bat`.

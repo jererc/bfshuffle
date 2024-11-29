@@ -4,13 +4,6 @@ Battlefield 2042 Maps Shuffler
 Generates a random map rotation for a [Battlefield 2042 Portal](https://portal.battlefield.com) experience.
 
 
-Requirements
-------------
-
-- python
-- google chrome or brave
-
-
 Install
 -------
 

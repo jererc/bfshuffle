@@ -1,14 +1,11 @@
+from contextlib import contextmanager
+import os
 from pprint import pformat
 import random
 import time
 from urllib.parse import urlparse, parse_qs
 
-from selenium.common.exceptions import (NoSuchElementException,
-    ElementClickInterceptedException)
-from selenium.webdriver import ActionChains
-from selenium.webdriver.common.actions.wheel_input import ScrollOrigin
-from selenium.webdriver.common.by import By
-from webutils.browser import get_driver
+from playwright.sync_api import sync_playwright
 
 
 MAX_MAPS = 20
@@ -17,7 +14,29 @@ MAX_MAPS = 20
 class Shuffler:
     def __init__(self, config):
         self.config = config
-        self.driver = get_driver(browser_id=config.BROWSER_ID)
+        self.work_path = os.path.join(os.path.expanduser('~'),
+            f'.{os.path.splitext(os.path.basename(__file__))[0]}',
+        )
+
+    @contextmanager
+    def playwright_context(self):
+        if not os.path.exists(self.work_path):
+            os.makedirs(self.work_path)
+        state_path = os.path.join(self.work_path, 'state.json')
+        with sync_playwright() as p:
+            try:
+                browser = p.chromium.launch(
+                    headless=False,
+                    args=[
+                        # '--disable-blink-features=AutomationControlled',
+                    ],
+                )
+                context = browser.new_context(storage_state=state_path
+                    if os.path.exists(state_path) else None)
+                yield context
+            finally:
+                context.storage_state(path=state_path)
+                context.close()
 
     def _get_map_rotation_url(self, url):
         try:
@@ -27,58 +46,38 @@ class Shuffler:
         return 'https://portal.battlefield.com/experience/mode/choose-maps' \
             f'?playgroundId={playground_id}'
 
-    def _wait_for_login(self, url, poll_frequency=.5, timeout=120):
-        self.driver.get(url)
-        end_ts = time.time() + timeout
-        while time.time() < end_ts:
-            try:
-                return self.driver.find_element(By.XPATH,
-                    '//div[@title and contains(., "CORE")]')
-            except NoSuchElementException:
-                time.sleep(poll_frequency)
-        raise Exception('login timeout')
-
-    def _find_map_elements(self):
-        return self.driver.find_elements(By.XPATH, '//app-map-row')
-
-    def _wait_for_maps(self, url, attempts=3, poll_frequency=.5, timeout=3):
-        for i in range(attempts):   # sometimes the content does not load
-            end_ts = time.time() + timeout
-            while time.time() < end_ts:
-                if self._find_map_elements():
-                    return
-                time.sleep(poll_frequency)
-            self.driver.get(url)
-        raise Exception('maps timeout')
-
-    def _get_map_name(self, map_element):
-        return map_element.find_element(By.XPATH, './/span[@title]').text
-
-    def _get_and_clear_map_rotation(self):
+    def _get_current_maps(self, page):
+        elements = page.locator('xpath=//app-map-row[contains(@class, "map-row") '
+            'and contains(@class, "compact")]').all()
         res = []
-        while True:
-            try:
-                el = self.driver.find_element(By.XPATH,
-                    '//app-map-row[contains(@class, "map-row") '
-                    'and contains(@class, "compact")]')
-                res.append(self._get_map_name(el))
-                el.find_element(By.XPATH,
-                    './/button[mat-icon[@data-mat-icon-name'
-                    '="remove_circle_outline"]]',
-                    ).click()
-            except NoSuchElementException:
-                break
+        for element in reversed(elements):
+            span = element.locator('xpath=.//span[@title]').nth(0)
+            res.insert(0, span.text_content().strip().lower())
+            element.locator('xpath=.//button[mat-icon[@data-mat-icon-name'
+                '="remove_circle_outline"]]').click()
+        return res
+
+    def _get_available_map_elements(self, page):
+        res = {}
+        for element in page.locator('xpath=//app-map-row').element_handles():
+            element.scroll_into_view_if_needed()
+            span = element.query_selector('xpath=.//span[@title]')
+            res[span.text_content().strip().lower()] = element
         return res
 
     def _select_maps(self, available_maps, map_rotation,
             included_maps, excluded_maps, max_maps):
         print(f'map rotation:\n{pformat(map_rotation)}')
-        print(f'available maps:\n{pformat(sorted(available_maps))}')
         if included_maps:
-            new_map_rotation = list(available_maps & set(included_maps))
+            new_map_rotation = list(available_maps
+                & {r.lower() for r in included_maps})
         elif excluded_maps:
-            new_map_rotation = list(available_maps - set(excluded_maps))
+            new_map_rotation = list(available_maps
+                - {r.lower() for r in excluded_maps})
         else:
+            new_map_rotation = list(available_maps)
+        if not new_map_rotation:
+            print('fallback on all available maps')
             new_map_rotation = list(available_maps)
         random.shuffle(new_map_rotation)
         new_map_rotation = new_map_rotation[:min(max_maps, MAX_MAPS)]
@@ -87,63 +86,28 @@ class Shuffler:
         print(f'new map rotation:\n{pformat(new_map_rotation)}')
         return new_map_rotation
 
-    def _scroll_from_element(self, element, y):
-        scroll_origin = ScrollOrigin.from_element(element)
-        (ActionChains(self.driver)
-            .scroll_from_origin(scroll_origin, 0, y)
-            .perform()
-        )
-
-    def _add_map_element(self, element):
-        element.find_element(By.XPATH,
-            './/button[mat-icon[@data-mat-icon-name="add_circle_outline"]]',
-            ).click()
-
-    def _save(self):
-        def get_save_button():
-            return self.driver.find_element(By.XPATH,
-                '//button[@aria-label="save button"]')
-
-        get_save_button().click()
-        end_ts = time.time() + 5
-        while time.time() < end_ts:
-            try:
-                get_save_button()
-            except NoSuchElementException:
-                print('saved')
-                return
-            time.sleep(.5)
-
-    def shuffle(self, url, included_maps=None, excluded_maps=None,
+    def shuffle(self, page, url, included_maps=None, excluded_maps=None,
             max_maps=MAX_MAPS):
         map_url = self._get_map_rotation_url(url)
         print(f'map rotation url: {map_url}')
-        self._wait_for_login(map_url)
-        self._wait_for_maps(map_url)
-        map_rotation = self._get_and_clear_map_rotation()
-        map_els = self._find_map_elements()   # reload to avoid stale elements
-        map_data = {self._get_map_name(e): {'el': e, 'y': e.location['y']}
-            for e in map_els}
-        selected_maps = self._select_maps(set(map_data.keys()),
-            map_rotation, included_maps, excluded_maps, max_maps)
-        y_offset = map_els[0].location['y']
+        page.goto(map_url)
+        page.wait_for_selector('xpath=//app-map-row', timeout=120000)
+        current_maps = self._get_current_maps(page)
+        available_map_elements = self._get_available_map_elements(page)
+        available_maps = set(available_map_elements.keys())
+        selected_maps = self._select_maps(available_maps,
+            current_maps, included_maps, excluded_maps, max_maps)
         for name in selected_maps:
-            data = map_data[name]
-            for i in range(2):
-                try:
-                    self._add_map_element(data['el'])
-                    break
-                except ElementClickInterceptedException:
-                    if i == 0:
-                        self._scroll_from_element(map_els[0],
-                            data['y'] - y_offset)
-                    else:
-                        print(f'failed to add map {name}')
-        self._save()
+            element = available_map_elements[name]
+            element.scroll_into_view_if_needed()
+            element.query_selector(
+                'xpath=.//button[mat-icon[@data-mat-icon-name="add_circle_outline"]]').click()
+        page.wait_for_selector('xpath=//button[@aria-label="save button"]',
+            timeout=10000).click()
+        time.sleep(3)
 
     def run(self):
-        try:
+        with self.playwright_context() as context:
+            page = context.new_page()
             for config in self.config.CONFIGS:
-                self.shuffle(**config)
-        finally:
-            self.driver.quit()
+                self.shuffle(page, **config)

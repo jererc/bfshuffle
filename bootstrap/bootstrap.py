@@ -10,5 +10,8 @@ Bootstrapper(
         # 'git+https://github.com/jererc/bfshuffle.git',
         'bfshuffle @ https://github.com/jererc/bfshuffle/archive/refs/heads/main.zip',
     ],
+    extra_cmds=[
+        ['playwright', 'install'],
+    ],
     force_reinstall=True,
 ).setup_script()

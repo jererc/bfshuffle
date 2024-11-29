@@ -11,10 +11,7 @@ def main():
     parser.add_argument('--path', '-p', default=os.getcwd())
     args = parser.parse_args()
     path = os.path.realpath(os.path.expanduser(args.path))
-    config = Config(
-        os.path.join(path, 'user_settings.py'),
-        BROWSER_ID='chrome',
-    )
+    config = Config(os.path.join(path, 'user_settings.py'))
     Shuffler(config).run()
 
 

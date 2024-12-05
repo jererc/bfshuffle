@@ -14,15 +14,15 @@ MAX_MAPS = 20
 class Shuffler:
     def __init__(self, config):
         self.config = config
-        self.work_path = os.path.join(os.path.expanduser('~'),
+        self.work_dir = os.path.join(os.path.expanduser('~'),
             f'.{os.path.splitext(os.path.basename(__file__))[0]}',
         )
 
     @contextmanager
     def playwright_context(self):
-        if not os.path.exists(self.work_path):
-            os.makedirs(self.work_path)
-        state_path = os.path.join(self.work_path, 'state.json')
+        if not os.path.exists(self.work_dir):
+            os.makedirs(self.work_dir)
+        state_path = os.path.join(self.work_dir, 'state.json')
         with sync_playwright() as p:
             try:
                 browser = p.chromium.launch(

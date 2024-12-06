@@ -67,7 +67,7 @@ class Shuffler:
 
     def _select_maps(self, available_maps, map_rotation,
             included_maps, excluded_maps, max_maps):
-        print(f'map rotation:\n{pformat(map_rotation)}')
+        logger.info(f'map rotation:\n{pformat(map_rotation)}')
         if included_maps:
             new_map_rotation = list(available_maps
                 & {r.lower() for r in included_maps})
@@ -77,19 +77,19 @@ class Shuffler:
         else:
             new_map_rotation = list(available_maps)
         if not new_map_rotation:
-            print('fallback on all available maps')
+            logger.info('fallback on all available maps')
             new_map_rotation = list(available_maps)
         random.shuffle(new_map_rotation)
         new_map_rotation = new_map_rotation[:min(max_maps, MAX_MAPS)]
         if map_rotation and new_map_rotation[0] == map_rotation[0]:
             new_map_rotation.append(new_map_rotation.pop(0))
-        print(f'new map rotation:\n{pformat(new_map_rotation)}')
+        logger.info(f'new map rotation:\n{pformat(new_map_rotation)}')
         return new_map_rotation
 
     def shuffle(self, page, url, included_maps=None, excluded_maps=None,
             max_maps=MAX_MAPS):
         map_url = self._get_map_rotation_url(url)
-        print(f'map rotation url: {map_url}')
+        logger.info(f'map rotation url: {map_url}')
         page.goto(map_url)
         page.wait_for_selector('xpath=//app-map-row', timeout=120000)
         current_maps = self._get_current_maps(page)

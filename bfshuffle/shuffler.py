@@ -110,4 +110,7 @@ class Shuffler:
         with self.playwright_context() as context:
             page = context.new_page()
             for config in self.config.CONFIGS:
-                self.shuffle(page, **config)
+                try:
+                    self.shuffle(page, **config)
+                except Exception:
+                    logger.exception('failed')

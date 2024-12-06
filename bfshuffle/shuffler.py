@@ -7,7 +7,7 @@ from urllib.parse import urlparse, parse_qs
 
 from playwright.sync_api import sync_playwright
 
-from bfshuffle import NAME, WORK_DIR, logger
+from bfshuffle import WORK_DIR, logger
 
 
 MAX_MAPS = 20
@@ -47,9 +47,9 @@ class Shuffler:
             f'?playgroundId={playground_id}'
 
     def _get_current_maps(self, page):
-        elements = page.locator('xpath=//app-map-row[contains(@class, "map-row") '
-            'and contains(@class, "compact")]').all()
         res = []
+        elements = page.locator('xpath=//app-map-row[contains(@class, '
+            '"map-row") and contains(@class, "compact")]').all()
         for element in reversed(elements):
             span = element.locator('xpath=.//span[@title]').nth(0)
             res.insert(0, span.text_content().strip().lower())
@@ -57,34 +57,32 @@ class Shuffler:
                 '="remove_circle_outline"]]').click()
         return res
 
-    def _get_available_map_elements(self, page):
+    def _get_available_maps(self, page):
         res = {}
-        for element in page.locator('xpath=//app-map-row').element_handles():
-            element.scroll_into_view_if_needed()
-            span = element.query_selector('xpath=.//span[@title]')
-            res[span.text_content().strip().lower()] = element
+        for element in page.locator('xpath=//app-map-row[not(contains(@class, '
+                '"compact"))]/div/div/span[@title]').all():
+            text = element.text_content().strip()
+            res[text.lower()] = text
         return res
 
-    def _select_maps(self, available_maps, map_rotation,
+    def _select_maps(self, available_maps, current_maps,
             included_maps, excluded_maps, max_maps):
-        logger.info(f'map rotation:\n{pformat(map_rotation)}')
         if included_maps:
-            new_map_rotation = list(available_maps
+            selected_maps = list(available_maps
                 & {r.lower() for r in included_maps})
         elif excluded_maps:
-            new_map_rotation = list(available_maps
+            selected_maps = list(available_maps
                 - {r.lower() for r in excluded_maps})
         else:
-            new_map_rotation = list(available_maps)
-        if not new_map_rotation:
+            selected_maps = list(available_maps)
+        if not selected_maps:
             logger.info('fallback on all available maps')
-            new_map_rotation = list(available_maps)
-        random.shuffle(new_map_rotation)
-        new_map_rotation = new_map_rotation[:min(max_maps, MAX_MAPS)]
-        if map_rotation and new_map_rotation[0] == map_rotation[0]:
-            new_map_rotation.append(new_map_rotation.pop(0))
-        logger.info(f'new map rotation:\n{pformat(new_map_rotation)}')
-        return new_map_rotation
+            selected_maps = list(available_maps)
+        random.shuffle(selected_maps)
+        selected_maps = selected_maps[:min(max_maps, MAX_MAPS)]
+        if current_maps and selected_maps[0] == current_maps[0]:
+            selected_maps.append(selected_maps.pop(0))
+        return selected_maps
 
     def shuffle(self, page, url, included_maps=None, excluded_maps=None,
             max_maps=MAX_MAPS):
@@ -93,15 +91,20 @@ class Shuffler:
         page.goto(map_url)
         page.wait_for_selector('xpath=//app-map-row', timeout=120000)
         current_maps = self._get_current_maps(page)
-        available_map_elements = self._get_available_map_elements(page)
-        available_maps = set(available_map_elements.keys())
-        selected_maps = self._select_maps(available_maps,
+        logger.info(f'current map rotation:\n{pformat(current_maps)}')
+        available_maps = self._get_available_maps(page)
+        logger.info(f'available maps:\n{pformat(list(available_maps.keys()))}')
+        selected_maps = self._select_maps(available_maps.keys(),
             current_maps, included_maps, excluded_maps, max_maps)
+        logger.info(f'new map rotation:\n{pformat(selected_maps)}')
         for name in selected_maps:
-            element = available_map_elements[name]
+            map_title = available_maps[name]
+            element = page.locator('xpath=//app-map-row[not(contains(@class, '
+                '"compact")) and .//span[@title '
+                f'and contains(text(), "{map_title}")]]').nth(0)
             element.scroll_into_view_if_needed()
-            element.query_selector(
-                'xpath=.//button[mat-icon[@data-mat-icon-name="add_circle_outline"]]').click()
+            element.locator('xpath=.//button[mat-icon['
+                '@data-mat-icon-name="add_circle_outline"]]').nth(0).click()
         page.wait_for_selector('xpath=//button[@aria-label="save button"]',
             timeout=10000).click()
         time.sleep(3)

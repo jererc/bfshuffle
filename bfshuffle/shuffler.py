@@ -5,7 +5,7 @@ import random
 import time
 from urllib.parse import urlparse, parse_qs
 
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import TimeoutError, sync_playwright
 
 from bfshuffle import WORK_DIR, logger
 
@@ -84,12 +84,29 @@ class Shuffler:
             selected_maps.append(selected_maps.pop(0))
         return selected_maps
 
+    def _wait_for_maps(self, map_url, page, timeout=120):
+        end_ts = time.time() + timeout
+        page.goto(map_url)
+        while time.time() < end_ts:
+            try:
+                page.wait_for_selector('xpath=//app-map-row', timeout=5000)
+                return
+            except TimeoutError:
+                try:
+                    element = page.locator('xpath=//div[@title '
+                        'and contains(text(), "CORE")]').all()
+                except Exception:   # logging in
+                    element = None
+                if element:
+                    logger.warning('no map, reloading...')
+                    page.goto(map_url)
+                    end_ts = time.time() + 10
+
     def shuffle(self, page, url, included_maps=None, excluded_maps=None,
             max_maps=MAX_MAPS):
         map_url = self._get_map_rotation_url(url)
         logger.info(f'map rotation url: {map_url}')
-        page.goto(map_url)
-        page.wait_for_selector('xpath=//app-map-row', timeout=120000)
+        self._wait_for_maps(map_url, page)
         current_maps = self._get_current_maps(page)
         logger.info(f'current map rotation:\n{pformat(current_maps)}')
         available_maps = self._get_available_maps(page)

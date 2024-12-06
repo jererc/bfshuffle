@@ -9,9 +9,4 @@ Install
 
 Download `bootstrap\bootstrap.bat` in some directory and run it.
 Update the url and maps in the `user_settings.py` config file.
-
-
-Run
----
-
-Run `bfshuffle.bat`.
+A shortcut is created in the start menu.

@@ -7,6 +7,8 @@ from urllib.parse import urlparse, parse_qs
 
 from playwright.sync_api import sync_playwright
 
+from bfshuffle import NAME, WORK_DIR, logger
+
 
 MAX_MAPS = 20
 
@@ -14,9 +16,7 @@ MAX_MAPS = 20
 class Shuffler:
     def __init__(self, config):
         self.config = config
-        self.work_dir = os.path.join(os.path.expanduser('~'),
-            f'.{os.path.splitext(os.path.basename(__file__))[0]}',
-        )
+        self.work_dir = WORK_DIR
 
     @contextmanager
     def playwright_context(self):

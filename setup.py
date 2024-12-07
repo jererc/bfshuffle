@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='bfshuffle',
-    version='2024.12.06.082155',
+    version='2024.12.07.095834',
     author='jererc',
     author_email='jererc@gmail.com',
     url='https://github.com/jererc/bfshuffle',

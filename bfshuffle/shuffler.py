@@ -20,8 +20,6 @@ class Shuffler:
 
     @contextmanager
     def playwright_context(self):
-        if not os.path.exists(self.work_dir):
-            os.makedirs(self.work_dir)
         state_path = os.path.join(self.work_dir, 'state.json')
         with sync_playwright() as p:
             try:

@@ -14,4 +14,4 @@ Bootstrapper(
         ['playwright', 'install'],
     ],
     force_reinstall=True,
-).setup_script()
+).setup_shortcut()

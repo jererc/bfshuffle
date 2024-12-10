@@ -10,10 +10,10 @@ Bootstrapper(
         # 'git+https://github.com/jererc/bfshuffle.git',
         'bfshuffle @ https://github.com/jererc/bfshuffle/archive/refs/heads/main.zip',
     ],
+    force_reinstall=True,
     extra_cmds=[
         ['playwright', 'install'],
     ],
-    force_reinstall=True,
     download_assets=[
         ('user_settings.py', 'https://raw.githubusercontent.com/jererc/bfshuffle/refs/heads/main/bootstrap/user_settings.py'),
     ],

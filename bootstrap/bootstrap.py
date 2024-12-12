@@ -12,7 +12,8 @@ Bootstrapper(
     ],
     force_reinstall=True,
     extra_cmds=[
-        ['playwright', 'install'],
+        ['playwright', 'install-deps'],
+        ['playwright', 'install', 'chromium'],
     ],
     download_assets=[
         ('user_settings.py', 'https://raw.githubusercontent.com/jererc/bfshuffle/refs/heads/main/bootstrap/user_settings.py'),

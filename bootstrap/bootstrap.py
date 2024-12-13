@@ -11,8 +11,10 @@ Bootstrapper(
         'bfshuffle @ https://github.com/jererc/bfshuffle/archive/refs/heads/main.zip',
     ],
     force_reinstall=True,
-    extra_cmds=[
+    init_cmds=[
         ['playwright', 'install-deps'],
+    ],
+    extra_cmds=[
         ['playwright', 'install', 'chromium'],
     ],
     download_assets=[

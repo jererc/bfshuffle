@@ -30,8 +30,11 @@ class Shuffler:
                         # '--disable-blink-features=AutomationControlled',
                     ],
                 )
-                context = browser.new_context(storage_state=state_path
-                    if os.path.exists(state_path) else None)
+                context = browser.new_context(
+                    viewport={'width': 1920, 'height': 1080},
+                    storage_state=state_path
+                        if os.path.exists(state_path) else None,
+                )
                 yield context
             finally:
                 if context:
@@ -66,7 +69,7 @@ class Shuffler:
         return res
 
     def _select_maps(self, available_maps, current_maps,
-            included_maps, excluded_maps, max_maps):
+                     included_maps, excluded_maps, max_maps):
         if included_maps:
             selected_maps = list(available_maps
                 & {r.lower() for r in included_maps})
@@ -84,26 +87,28 @@ class Shuffler:
             selected_maps.append(selected_maps.pop(0))
         return selected_maps
 
-    def _wait_for_maps(self, map_url, page, timeout=120):
+    def _wait_for_maps(self, map_url, page, selector_timeout=10000,
+                       timeout=120):
         end_ts = time.time() + timeout
         page.goto(map_url)
         while time.time() < end_ts:
             try:
-                page.wait_for_selector('xpath=//app-map-row', timeout=5000)
+                page.wait_for_selector('xpath=//app-map-row',
+                    timeout=selector_timeout)
                 return
             except TimeoutError:
                 try:
                     element = page.locator('xpath=//div[@title '
                         'and contains(text(), "CORE")]').all()
-                except Exception:   # logging in
+                except Exception:   # wait for login
                     element = None
                 if element:
                     logger.warning('no map, reloading...')
                     page.goto(map_url)
-                    end_ts = time.time() + 10
+                    end_ts = time.time() + selector_timeout * 2
 
     def shuffle(self, page, url, included_maps=None, excluded_maps=None,
-            max_maps=MAX_MAPS):
+                max_maps=MAX_MAPS):
         map_url = self._get_map_rotation_url(url)
         logger.info(f'map rotation url: {map_url}')
         self._wait_for_maps(map_url, page)

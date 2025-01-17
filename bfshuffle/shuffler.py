@@ -31,7 +31,6 @@ class Shuffler:
                     ],
                 )
                 context = browser.new_context(
-                    viewport={'width': 1920, 'height': 1080},
                     storage_state=state_path
                         if os.path.exists(state_path) else None,
                 )

@@ -131,8 +131,8 @@ class Shuffler:
 
     def run(self):
         with self.playwright_context() as context:
-            page = context.new_page()
             for config in self.config.CONFIGS:
+                page = context.new_page()
                 try:
                     self.shuffle(page, **config)
                 except Exception:

@@ -29,10 +29,8 @@ class Shuffler:
                         # '--disable-blink-features=AutomationControlled',
                     ],
                 )
-                context = browser.new_context(
-                    storage_state=state_path
-                        if os.path.exists(state_path) else None,
-                )
+                context = browser.new_context(storage_state=state_path
+                                              if os.path.exists(state_path) else None)
                 yield context
             finally:
                 if context:
@@ -50,18 +48,18 @@ class Shuffler:
     def _get_current_maps(self, page):
         res = []
         elements = page.locator('xpath=//app-map-row[contains(@class, '
-            '"map-row") and contains(@class, "compact")]').all()
+                                '"map-row") and contains(@class, "compact")]').all()
         for element in reversed(elements):
             span = element.locator('xpath=.//span[@title]').nth(0)
             res.insert(0, span.text_content().strip().lower())
             element.locator('xpath=.//button[mat-icon[@data-mat-icon-name'
-                '="remove_circle_outline"]]').click()
+                            '="remove_circle_outline"]]').click()
         return res
 
     def _get_available_maps(self, page):
         res = {}
         for element in page.locator('xpath=//app-map-row[not(contains(@class, '
-                '"compact"))]/div/div/span[@title]').all():
+                                    '"compact"))]/div/div/span[@title]').all():
             text = element.text_content().strip()
             res[text.lower()] = text
         return res
@@ -69,11 +67,9 @@ class Shuffler:
     def _select_maps(self, available_maps, current_maps,
                      included_maps, excluded_maps, max_maps):
         if included_maps:
-            selected_maps = list(available_maps
-                & {r.lower() for r in included_maps})
+            selected_maps = list(available_maps & {r.lower() for r in included_maps})
         elif excluded_maps:
-            selected_maps = list(available_maps
-                - {r.lower() for r in excluded_maps})
+            selected_maps = list(available_maps - {r.lower() for r in excluded_maps})
         else:
             selected_maps = list(available_maps)
         if not selected_maps:
@@ -92,12 +88,12 @@ class Shuffler:
         while time.time() < end_ts:
             try:
                 page.wait_for_selector('xpath=//app-map-row',
-                    timeout=selector_timeout)
+                                       timeout=selector_timeout)
                 return
             except TimeoutError:
                 try:
                     element = page.locator('xpath=//div[@title '
-                        'and contains(text(), "CORE")]').all()
+                                           'and contains(text(), "CORE")]').all()
                 except Exception:   # wait for login
                     element = None
                 if element:
@@ -115,18 +111,18 @@ class Shuffler:
         available_maps = self._get_available_maps(page)
         logger.info(f'available maps:\n{pformat(list(available_maps.keys()))}')
         selected_maps = self._select_maps(available_maps.keys(),
-            current_maps, included_maps, excluded_maps, max_maps)
+                                          current_maps, included_maps, excluded_maps, max_maps)
         logger.info(f'new map rotation:\n{pformat(selected_maps)}')
         for name in selected_maps:
             map_title = available_maps[name]
             element = page.locator('xpath=//app-map-row[not(contains(@class, '
-                '"compact")) and .//span[@title '
-                f'and contains(text(), "{map_title}")]]').nth(0)
+                                   '"compact")) and .//span[@title '
+                                   f'and contains(text(), "{map_title}")]]').nth(0)
             element.scroll_into_view_if_needed()
             element.locator('xpath=.//button[mat-icon['
-                '@data-mat-icon-name="add_circle_outline"]]').nth(0).click()
+                            '@data-mat-icon-name="add_circle_outline"]]').nth(0).click()
         page.wait_for_selector('xpath=//button[@aria-label="save button"]',
-            timeout=10000).click()
+                               timeout=10000).click()
         time.sleep(3)
 
     def run(self):

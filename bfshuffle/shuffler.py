@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+import logging
 import os
 from pprint import pformat
 import random
@@ -7,10 +8,12 @@ from urllib.parse import urlparse, parse_qs
 
 from playwright.sync_api import TimeoutError, sync_playwright
 
-from bfshuffle import WORK_DIR, logger
+from bfshuffle import WORK_DIR
 
 
 MAX_MAPS = 20
+
+logger = logging.getLogger(__name__)
 
 
 class Shuffler:

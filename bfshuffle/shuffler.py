@@ -10,7 +10,6 @@ from playwright.sync_api import TimeoutError, sync_playwright
 
 from bfshuffle import WORK_DIR
 
-
 MAX_MAPS = 20
 
 logger = logging.getLogger(__name__)

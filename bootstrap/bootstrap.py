@@ -20,6 +20,6 @@ Bootstrapper(
         {'name': 'bfshuffle', 'args': ['bfshuffle.main', '-p', os.getcwd()]},
     ],
     download_assets=[
-        ('user_settings.py', 'https://raw.githubusercontent.com/jererc/bfshuffle/refs/heads/main/bootstrap/user_settings.py'),
+        {'filename': 'user_settings.py', 'url': 'https://raw.githubusercontent.com/jererc/bfshuffle/refs/heads/main/bootstrap/user_settings.py'},
     ],
 )

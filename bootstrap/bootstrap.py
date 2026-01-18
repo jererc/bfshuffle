@@ -17,7 +17,7 @@ Bootstrapper(
         ['playwright', 'install', 'chromium'],
     ],
     shortcuts=[
-        {'name': 'bfshuffle', 'args': ['bfshuffle.main', '-p', os.getcwd()]},
+        {'name': 'bfshuffle', 'args': ['bfshuffle.main', '-p', os.getcwd()], 'headless': True},
     ],
     download_assets=[
         {'filename': 'user_settings.py', 'url': 'https://raw.githubusercontent.com/jererc/bfshuffle/refs/heads/main/bootstrap/user_settings.py'},
